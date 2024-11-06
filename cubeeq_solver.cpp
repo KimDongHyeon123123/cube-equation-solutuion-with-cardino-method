@@ -1,4 +1,4 @@
-//참고: https://www.youtube.com/watch?v=q14F6fZf5kc
+//inspired by: https://www.youtube.com/watch?v=q14F6fZf5kc
 
 #include <stdio.h>
 #include <math.h>
@@ -7,8 +7,8 @@
 #define PI 3.141592653589793238462643383279
 _C_double_complex make_complex(double real, double imag) {
     _C_double_complex result;
-    result._Val[0] = real; // 실수부 설정
-    result._Val[1] = imag; // 허수부 설정
+    result._Val[0] = real; // real set
+    result._Val[1] = imag; // imaginary set
     return result;
 }
 
@@ -50,28 +50,28 @@ int main()
     double cpu_time_used;*/
     
     double co[4]; _C_double_complex roots[3];
-    double a, b, c, d, p, q, discrem, u, v,c1,c2,c3;
+    double a, b, c, d, p, q, discrem, u, v, c1, c2, c3;
     for (int i = 3; i > 0; i--) {
-        printf("%d차항의 계수 : ", i);
+        printf("Coefficient of %d degree term: ", i);
         if (scanf_s("%lf", &co[3 - i]) != 1) {
-            printf("잘못된 입력입니다.\n");
+            printf("Invalid input.\n");
             return 1;
         }
     }
-    printf("상수항의 계수 : ");
+    printf("Constant term coefficient: ");
     if (scanf_s("%lf", &co[3]) != 1) {
-        printf("잘못된 입력입니다.\n");
+        printf("Invalid input.\n");
         return 1;
     }
 
     if (co[0] == 0) {
-        printf("3차 방정식이 아닙니다. a가 0입니다.\n");
+        printf("Not a cubic equation. 'a' is 0.\n");
         return 1;
     }
     //start = clock();
-    printf("\n입력한 함수\n");
+    printf("\nInput function\n");
     printf("f(x) = %.1lfx^3 %+0.1lfx^2 %+0.1lfx %+0.1lf\n", co[0], co[1], co[2], co[3]);
-    //계산 t^3 + pt+ q = 0, t = x+b/3a
+    // Calculation for t^3 + pt + q = 0, where t = x + b / 3a
     a = co[0];
     b = co[1];
     c = co[2];
@@ -80,20 +80,20 @@ int main()
     c2 = c / a;
     c3 = d / a;
     double b3a = -c1 / 3;
-    p = c2 - (c1*c1/(3));
-    q = c3 - c1*c2/(3) + 2*c1*c1*c1/(27);
-    //printf("b3a : %.6lf     p : %.6lf     q : %.6lf\n\n",b3a, p, q);
-    //판별식
-    discrem = pow(q,2.0) / 4.0 + pow(p,3.0) / 27.0;
+    p = c2 - (c1 * c1 / 3);
+    q = c3 - c1 * c2 / 3 + 2 * c1 * c1 * c1 / 27;
+    //printf("b3a : %.6lf     p : %.6lf     q : %.6lf\n\n", b3a, p, q);
+    // Discriminant
+    discrem = pow(q, 2.0) / 4.0 + pow(p, 3.0) / 27.0;
 
     if (discrem > 1e-6) {
-        //printf("판별식 > 0\n");
+        //printf("Discriminant > 0\n");
         u = cbrt(-q / 2 + sqrt(discrem));
         v = -p / (3 * u);
         //printf("discrem : %.6lf\n\nu : %.6lf    v : %.6lf\n", discrem, u, v);
         _C_double_complex tu = make_complex(u, 0);
         _C_double_complex tv = make_complex(v, 0);
-        roots[0] = make_complex(u +v + b3a, 0);
+        roots[0] = make_complex(u + v + b3a, 0);
         _C_double_complex theta = make_complex(0, 2.0 * PI / 3.0);
         _C_double_complex theta2 = make_complex(0, -2.0 * PI / 3.0);
 
@@ -107,8 +107,8 @@ int main()
         roots[2]._Val[0] += b3a;
     }
     else if (fabs(discrem) < 1e-6) {
-        //printf("판별식 == 0\n");
-        if (q == 0) { // 3중근
+        //printf("Discriminant == 0\n");
+        if (q == 0) { // Triple root
             double root3 = -b / (3 * a);
             roots[0] = make_complex(root3, 0);
             roots[1] = make_complex(root3, 0);
@@ -122,10 +122,10 @@ int main()
             roots[2] = make_complex(-u + b3a, 0);
         }
     }
-    else {//서로다른 3실근
-        //printf("판별식 < 0\n");
-        //q == 0이면 t(t^2 +p)이므로 x = -b/3a or x = -b/3a +- sqrt(p)
-        //q == 0이면 p < 0 왜냐하면 discrem < 0 이기 때문에
+    else { // Three distinct real roots
+        //printf("Discriminant < 0\n");
+        // When q == 0, we have t(t^2 + p), so x = -b/3a or x = -b/3a 짹 sqrt(p)
+        // If q == 0, then p < 0 since discrem < 0
         if (q == 0) {
             roots[0] = make_complex(b3a, 0);
             roots[1] = make_complex(b3a + sqrt(-p), 0);
@@ -134,14 +134,14 @@ int main()
         else {
             double imgpart = sqrt(-discrem);
             double realpart = -q / 2;
-            double r = cbrt(sqrt(imgpart * imgpart + realpart * realpart));//크기
+            double r = cbrt(sqrt(imgpart * imgpart + realpart * realpart)); // magnitude
             //printf("r : %.6lf\n     ", r);
-            //u + v = t, x = t - b/3a
+            // u + v = t, x = t - b/3a
             for (int n = 0; n < 3; n++)
                 roots[n] = make_complex(2 * r * cos(PI / 12.0 + 2.0 * PI * n / 3.0) + b3a, 0);
         }
     }
-    printf("\n값\n");
+    printf("\nRoots\n");
     if (discrem > 1e-6) {
         printf("x1 = %.2lf\n", roots[0]._Val[0]);
         printf("x2 = %.2lf %+0.2lfi\n", roots[1]._Val[0], roots[1]._Val[1]);
@@ -153,11 +153,11 @@ int main()
         }
     }
 
-    //// 실행 시간 측정 종료
+    //// Stop time measurement
     //end = clock();
 
-    //// 시간 계산
+    //// Calculate time
     //cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    //printf("실행 시간: %f 초\n", cpu_time_used);
+    //printf("Execution time: %f seconds\n", cpu_time_used);
 }
